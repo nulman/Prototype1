@@ -10,11 +10,21 @@ public class VehicleCollision : MonoBehaviour
         
     }
 
-    // Update is called once per frame
-    void OnCollisionEnter(Collision collision)
-    {
-        if(collision.relativeVelocity.magnitude > 0.1)
-            Debug.Log("collided!");
-            PlayerController.instace.accel /= 10.0f;
+    void OnCollisionStay(Collision other) {
+        // if(other.relativeVelocity.magnitude > 0.1)
+        // {
+            // Debug.Log("collided with: " + other.gameObject.name);
+            if(gameObject.name.StartsWith("obstacle")){
+                PlayerController.instace.accel -= (PlayerController.instace.accel/10);
+            }else if(gameObject.name.StartsWith("Power")){
+                if(PlayerController.instace.accel < PlayerController.instace.speed){
+                    PlayerController.instace.accel += 10;
+                }else{
+                    PlayerController.instace.accel += 5f;
+                }
+            }
+            
+        // }
+        // Debug.Log(gameObject.name +" collided with: " + other.gameObject.name);
     }
 }
