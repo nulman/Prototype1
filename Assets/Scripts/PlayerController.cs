@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     public static PlayerController instace;
     public float speed{get;} = 100.0f;
     public float accel{get;set;}
+    public float delayedSpeed = 0.0f;
     
     private float turnSpeed = 5.0f;
     private float horizontalInput;
@@ -21,7 +22,10 @@ public class PlayerController : MonoBehaviour
     private List<GameObject> obstacles = new List<GameObject>();
     private int rollNum = 0;
     private Vector3 baseScale;
-
+    public Renderer stretchEffect;
+    void Awake() {
+        stretchEffect = GetComponent<Renderer>();
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -35,6 +39,7 @@ public class PlayerController : MonoBehaviour
     {
         //horizontalInput = Input.GetAxis("Horizontal");
         forwardInput = Input.GetAxis("Vertical");
+        horizontalInput = Input.GetAxis("Horizontal");
         if(Mathf.Abs(forwardInput) > 0.05f && accel <= speed)
         {
             if(Mathf.Sign(forwardInput) == 1)
@@ -45,19 +50,29 @@ public class PlayerController : MonoBehaviour
             {
                 accel-=0.1f;
             }
-            transform.localScale = new Vector3(1,1,1);
-            // accel=accel+(Mathf.Sign(forwardInput)/10);
+            // transform.localScale = new Vector3(1,1,1);
+            //// accel=accel+(Mathf.Sign(forwardInput)/10);
         }else if(accel > speed){
             accel-=0.03f;
-            transform.localScale = new Vector3(1,1,1+(accel-speed)/100.0f);
+            // transform.localScale = new Vector3(1,1,1+(accel-speed)/100.0f);
         }
+        if(accel >= 80.0f && delayedSpeed < 80.0f){
+            delayedSpeed = 80.0f;
+        }
+        delayedSpeed += (accel-delayedSpeed)/50.0f;
+        stretchEffect.material.SetFloat("_Speed", Mathf.Max(delayedSpeed/80.0f, 1.0f));
         Vector3 movement = Vector3.forward * Time.deltaTime * accel;
         transform.Translate(movement);
-        if(movement.magnitude > 0.3f && Random.Range(0,101) > 98-(accel/55)){
+        if(movement.magnitude > 0.3f && Random.Range(0,101) > 99-(accel/75)){
             AddObstacle(0);
-        }else if(movement.magnitude > 0.2f && Random.Range(0,101) > 98){
+        }else if(movement.magnitude > 0.2f && Random.Range(0,101) > 99){
             AddObstacle(1);
         }
+        if(Mathf.Abs(forwardInput) > 0.05f){
+            Quaternion target = Quaternion.Euler(0, 0, horizontalInput * 10.0f);
+            transform.rotation = Quaternion.Slerp(transform.rotation, target,  Time.deltaTime * 5.0f);
+        }
+
 
         // Debug.Log(movement.magnitude);
 
@@ -81,7 +96,7 @@ public class PlayerController : MonoBehaviour
             obj = Instantiate(BuffToCreate);
             oName = "buff_";
         }
-        Vector3 point = Random.insideUnitCircle.normalized*6.43f;
+        Vector3 point = Random.insideUnitCircle.normalized*6.4f;
         // Vector3 point = Random.onUnitSphere*6.43f;
         // obj.transform.localScale = new Vector3(3,3,3);
         // point.z = 0;

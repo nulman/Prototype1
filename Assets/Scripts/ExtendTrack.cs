@@ -29,7 +29,10 @@ public class ExtendTrack : MonoBehaviour
             GameObject newPipe = Instantiate(transform.parent.gameObject);
             newPipe.transform.Translate(new Vector3(0,0,168));
             newPipe.name = "Tube_Line_"+globals.rollName;
+            globals.direction.x = Random.Range(0, 2) == 1 ? 1 : -1;
             ++globals.rollName;
+            globals.direction.y = Random.Range(0, 2) == 1 ? 1 : -1;
+            // print("x is now: " + globals.direction.x + " y is now: " + globals.direction.y);
             // if(globals.rollName == globals.trackLength){
                 // FinishFlag.transform.SetParent(newPipe.transform);
                 // FinishFlag.transform.position = new Vector3(0,0,transform.position.z + 336);
